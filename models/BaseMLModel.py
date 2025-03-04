@@ -32,7 +32,7 @@ class BaseMLModel(ABC):
         pass
 
     @abstractmethod
-    def predict(self, X, y):
+    def predict(self, X):
         """
         Predict the target values for given input data.
 
