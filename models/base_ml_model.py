@@ -45,7 +45,7 @@ class BaseMLModel(ABC):
         pass
 
     @abstractmethod
-    def accuracy(self):
+    def accuracy(self, X, y):
         """
         Compute the accuracy of the model.
 
