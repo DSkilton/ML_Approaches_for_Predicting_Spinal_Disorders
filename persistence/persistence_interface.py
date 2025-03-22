@@ -10,7 +10,7 @@ class PersistenceInterface(ABC):
     """
     @classmethod
     @abstractmethod
-    def save(self, model: BaseEstimator, filepath: str):
+    def save(cls, model: BaseEstimator, filepath: str):
         """
         Persist the given machine learning model to the specified file path.
 
@@ -22,7 +22,7 @@ class PersistenceInterface(ABC):
 
     @classmethod
     @abstractmethod
-    def load(self, filepath: str) -> BaseEstimator:
+    def load(cls, filepath: str) -> BaseEstimator:
         """
         Load and return a machine learning model from the specified file path.
 

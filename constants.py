@@ -29,3 +29,20 @@ SCOLIOSIS_SLOPE = "scoliosis_slope"
 DEGREE_SPONDYLOLISTHESIS = "degree_spondylolisthesis"
 R2_SCORE = "R² Score"
 RMSE = "RMSE"
+MEAN = "mean"
+MEDIAN = "median"
+UNIFORM = "uniform"
+NAN_EUCLIDEAN = "nan_euclidean"
+
+# Titles
+MEAN_IMPUTATION = "Mean Imputation"
+MEDIAN_IMPUTATION = "Median Imputation"
+UNIFORM_IMPUTATION = "Uniform Imputation"
+KNN_IMPUTATION = "KNN Imputation"
+REGRESSION_IMPUTATION = "Regression-based Imputation (Iterative)"
+
+# Colours
+BLUE = 'blue'
+GREEN = 'green'
+PURPLE = 'purple'
+ORANGE = 'orange'

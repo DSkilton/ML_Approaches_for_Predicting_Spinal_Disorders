@@ -1,10 +1,7 @@
 from models.base_ml_model import BaseMLModel
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
-from base_ml_model import BaseMLModel
 from model_registry import register_model, ModelType
-import matplotlib.pyplot as plt
-import numpy as np
 
 @register_model(ModelType.CLASSIFIER)
 class LogisticRegressionModel(BaseMLModel):
@@ -32,7 +29,7 @@ class LogisticRegressionModel(BaseMLModel):
             X (array-like): Training feature matrix
             y (array-like): Training target vector 
 
-        ReturnsL
+        Returns:
             self: Returns the instance itself after training.
         """
         self.X_train = X
