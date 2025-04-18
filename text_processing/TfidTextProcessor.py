@@ -1,5 +1,5 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
-from text_processor import TextProcessorInterface
+from text_processing.text_processor import TextProcessorInterface
 
 class TfidTextProcessor(TextProcessorInterface):
     """
