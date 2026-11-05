@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Reproducibility: never commit local Python environments or generated scores
+venv311/
+.venv/
+results/
