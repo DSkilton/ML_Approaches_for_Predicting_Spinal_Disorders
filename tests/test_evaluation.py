@@ -22,9 +22,24 @@ class EvaluationTests(unittest.TestCase):
         self.assertNotIn(LABEL, X)
         self.assertEqual(len(X), len(y))
 
-    def test_preserve_supplied_diagnoses(self):
+    def test_hierarchical_labels_become_noncontradictory_binary_target(self):
         _, y = classification_inputs(self.data)
-        self.assertEqual(y.tolist(), self.data[LABEL].tolist())
+        expected = ["normal" if x == "normal" else "pathology" for x in self.data[LABEL]]
+        self.assertEqual(y.tolist(), expected)
+
+    def test_repeated_measurement_vectors_are_deduplicated(self):
+        copied = pd.concat([self.data, self.data.iloc[[0]]], ignore_index=True)
+        X, _ = classification_inputs(copied)
+        self.assertEqual(len(X), 90)
+        X_reg, _ = regression_inputs(copied)
+        self.assertEqual(len(X_reg), 90)
+
+    def test_contradictory_binary_labels_are_rejected(self):
+        contradictory = self.data.iloc[[1]].copy()
+        contradictory[LABEL] = "normal"
+        copied = pd.concat([self.data, contradictory], ignore_index=True)
+        with self.assertRaises(ValueError):
+            classification_inputs(copied)
 
     def test_holdout_models(self):
         cls = evaluate_classification(self.data, 3)
