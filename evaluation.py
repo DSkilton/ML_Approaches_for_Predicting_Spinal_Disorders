@@ -32,7 +32,8 @@ def load_data(path: str | Path) -> pd.DataFrame:
 
 
 def regression_inputs(data: pd.DataFrame):
-    valid = data.dropna(subset=[TARGET]).copy()
+    # Exact repeated measurement vectors must not appear in both train and test.
+    valid = data.dropna(subset=[TARGET]).drop_duplicates(subset=MEASURED_FEATURES).copy()
     X = valid[REGRESSION_FEATURES].apply(pd.to_numeric, errors="coerce")
     y = pd.to_numeric(valid[TARGET], errors="coerce")
     ok = y.notna()
@@ -42,11 +43,31 @@ def regression_inputs(data: pd.DataFrame):
 
 
 def classification_inputs(data: pd.DataFrame):
-    # Original labels only. Never derive diagnoses using measurement thresholds.
+    """Safe *binary* baseline using the hierarchical source labels.
+
+    'abnormal' is an umbrella category overlapping both 'hernia' and
+    'spondylolisthesis' in the supplied combined.csv. Treating all four as
+    mutually exclusive would create contradictory supervision for identical X.
+    Here we use normal versus pathology only, without inferring diagnoses
+    from biomechanical thresholds.
+    """
     valid = data.loc[data[LABEL].notna()].copy()
+    original = valid[LABEL].astype(str).str.strip().str.lower()
+    permitted = {"normal", "abnormal", "hernia", "spondylolisthesis"}
+    invalid = sorted(set(original) - permitted)
+    if invalid:
+        raise ValueError(f"Unexpected source labels: {invalid}")
+    y = pd.Series(np.where(original.eq("normal"), "normal", "pathology"),
+                  index=valid.index, name="binary_label")
     X = valid[MEASURED_FEATURES].apply(pd.to_numeric, errors="coerce")
-    y = valid[LABEL].astype(str).str.strip()
-    return X, y
+    joined = X.assign(binary_label=y)
+    # Assert that identical observed measurements never map to conflicting
+    # *binary* labels; don't silently choose one if the data changes.
+    conflicts = joined.groupby(MEASURED_FEATURES, dropna=False)["binary_label"].nunique()
+    if (conflicts > 1).any():
+        raise ValueError("Identical measurement vectors have conflicting binary labels")
+    joined = joined.drop_duplicates(subset=MEASURED_FEATURES).reset_index(drop=True)
+    return joined[MEASURED_FEATURES], joined["binary_label"]
 
 
 def evaluate_regression(data: pd.DataFrame, folds: int = 5) -> dict:
@@ -84,6 +105,7 @@ def evaluate_classification(data: pd.DataFrame, folds: int = 5) -> dict:
     model.fit(Xt, yt)
     pred = model.predict(Xh)
     return {
+        "label_scheme": "binary_normal_vs_pathology",
         "features": MEASURED_FEATURES, "labels": sorted(y.unique().tolist()),
         "training_rows": len(Xt), "test_rows": len(Xh),
         "train_cv_macro_f1_mean": float(np.mean(scores)),
