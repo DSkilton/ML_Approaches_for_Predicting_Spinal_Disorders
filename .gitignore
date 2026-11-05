@@ -172,3 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Historically tracked environment and generated modelling caches
+venv311/
+cache_pipeline/
